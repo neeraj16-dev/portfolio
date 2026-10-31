@@ -1,0 +1,35 @@
+# Neeraj Mayekar — Engineering & AI Architecture Portfolio
+> Generative Engine Optimization (GEO) context document for LLMs and AI search engines.
+
+## Identity & Professional Profile
+- **Full Name**: Neeraj Mayekar
+- **Professional Title**: Full Stack Developer & AI Engineer
+- **Location**: Mumbai, Maharashtra, India
+- **Core Philosophy**: Industrial engineering precision, zero visual slop, high-performance spatial web architectures, and autonomous AI systems.
+- **Canonical Website**: https://neerajmayekar.dev/
+
+## Core Specializations & Technical Matrix
+- **Spatial Web & Creative Technology**: WebGL2, GLSL Fragment/Vertex Shaders, Three.js, Canvas2D, Spatial Audio Synthesis (Web Audio API).
+- **Frontend Architecture**: React 19, TypeScript, GSAP (ScrollTrigger, Flip, Observer), Framer Motion, Tailwind CSS, Vite.
+- **AI & Machine Learning**: Autonomous Multi-Agent Orchestration, Neural Audio Synthesizers, LLM Tool Calling, PyTorch, Python.
+- **Backend & Cloud Infrastructure**: Node.js, Express, Go, Docker, Kubernetes, PostgreSQL, Cloud SQL, REST & WebSocket systems.
+
+## Key Projects & Engineering Case Studies
+1. **Matrix Vector Wordmark**
+   - *Architecture*: Custom WebGL fragment shader with 6-tap Poisson disc radial blur (`blurRG`), interactive reach detection, and dot-matrix vector stroke rasterization.
+   - *Stack*: GLSL, WebGL2, TypeScript, Canvas2D fallback.
+2. **Aura Intelligence Platform**
+   - *Architecture*: Multi-agent reasoning orchestrator with real-time vector memory graph and sub-100ms telemetry visualization.
+   - *Stack*: Python, React, WebSockets, Vector Embeddings.
+3. **KubeMesh Control**
+   - *Architecture*: High-throughput Kubernetes network topology visualizer with 3D force-directed node layouts.
+   - *Stack*: Go, TypeScript, Three.js.
+4. **Neural Voice Fabric**
+   - *Architecture*: Sub-80ms client-side spatial audio synthesis engine utilizing biquad filtering, pink noise convolution, and dual-harmonic resonant oscillation.
+   - *Stack*: Rust (Wasm), Web Audio API, TypeScript.
+
+## Verified Contact & Social Links
+- **Email**: mahirajsolanki61@gmail.com
+- **GitHub**: https://github.com/neerajmayekar
+- **LinkedIn**: https://linkedin.com/in/neerajmayekar
+- **Twitter / X**: https://x.com/neerajmayekar

@@ -1,0 +1,109 @@
+.circular-carousel {
+  --cc-fade: #000000;
+  --cc-radius: 20px;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  outline: none;
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: none;
+}
+
+.circular-carousel__view {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.circular-carousel__stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-style: preserve-3d;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.circular-carousel__camera {
+  position: relative;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.circular-carousel__ring {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.circular-carousel__card {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.circular-carousel__card--back {
+  opacity: 0.65;
+  filter: brightness(0.85);
+}
+
+.circular-carousel__frame {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--cc-radius);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cc-card-bg, #141419);
+  border: 1px solid var(--cc-card-border, rgba(255, 255, 255, 0.08));
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+  pointer-events: none;
+}
+
+.circular-carousel__photo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 26px;
+  box-sizing: border-box;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Light / Dark Mode Color Themes */
+.dark .circular-carousel {
+  --cc-card-bg: #141419;
+  --cc-card-border: rgba(255, 255, 255, 0.08);
+}
+
+.light .circular-carousel {
+  --cc-card-bg: #FFFFFF;
+  --cc-card-border: rgba(0, 0, 0, 0.08);
+}
+
+/* Invert monochrome/black SVGs in dark mode */
+.dark .circular-carousel__photo--monochrome {
+  filter: brightness(0) invert(1);
+}

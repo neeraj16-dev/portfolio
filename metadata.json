@@ -1,0 +1,6 @@
+{
+  "name": "Neeraj Mayekar Portfolio - Full Stack & AI Engineer",
+  "description": "Interactive 3D spatial portfolio of Neeraj Mayekar featuring WebGL vector wordmark, dynamic shader typography, dark/light themes, and real-time customizer.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
