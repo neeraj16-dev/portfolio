@@ -69,9 +69,14 @@ export const WavyTicker: React.FC<WavyTickerProps> = ({
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
+        const wasVisible = isVisible;
         isVisible = entry ? entry.isIntersecting : true;
         if (isVisible) {
           lastTimeRef.current = performance.now();
+          if (!wasVisible) {
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = requestAnimationFrame(animate);
+          }
         }
       },
       { threshold: 0.05 }
@@ -82,22 +87,20 @@ export const WavyTicker: React.FC<WavyTickerProps> = ({
     }
 
     const animate = (currentTime: number) => {
-      if (isVisible) {
-        const delta = Math.min(currentTime - lastTimeRef.current, 64);
-        lastTimeRef.current = currentTime;
+      if (!isVisible) return;
 
-        const targetSpeed = isHoveredRef.current ? speed * slowdownOnHover : speed;
-        currentSpeedRef.current += (targetSpeed - currentSpeedRef.current) * 0.08;
+      const delta = Math.min(currentTime - lastTimeRef.current, 64);
+      lastTimeRef.current = currentTime;
 
-        offsetRef.current += (currentSpeedRef.current * delta) / 1000;
-        const wrapped = ((offsetRef.current % singleCycleWidth) + singleCycleWidth) % singleCycleWidth;
-        const finalTrackOffset = direction === 'left' ? -wrapped : wrapped - singleCycleWidth;
+      const targetSpeed = isHoveredRef.current ? speed * slowdownOnHover : speed;
+      currentSpeedRef.current += (targetSpeed - currentSpeedRef.current) * 0.08;
 
-        if (trackRef.current) {
-          trackRef.current.style.transform = `translate3d(${finalTrackOffset}px, 0, 0)`;
-        }
-      } else {
-        lastTimeRef.current = currentTime;
+      offsetRef.current += (currentSpeedRef.current * delta) / 1000;
+      const wrapped = ((offsetRef.current % singleCycleWidth) + singleCycleWidth) % singleCycleWidth;
+      const finalTrackOffset = direction === 'left' ? -wrapped : wrapped - singleCycleWidth;
+
+      if (trackRef.current) {
+        trackRef.current.style.transform = `translate3d(${finalTrackOffset}px, 0, 0)`;
       }
 
       animationFrameId = requestAnimationFrame(animate);
@@ -153,6 +156,8 @@ export const WavyTicker: React.FC<WavyTickerProps> = ({
       style={{
         ...maskStyle,
         height: `${itemSize + actualWaveAmp * 2 + 52}px`,
+        contain: 'layout paint',
+        isolation: 'isolate',
       }}
       className={`relative w-full overflow-hidden select-none flex items-center ${className}`}
       aria-label="Interactive horizontal skills ticker"

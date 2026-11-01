@@ -96,20 +96,23 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({
       id="skills"
       className={`relative px-4 sm:px-6 lg:px-8 pt-12 pb-16 sm:pt-14 sm:pb-20 overflow-hidden transition-colors duration-500 ${
         isDark
-          ? 'bg-[#08080A]/60 backdrop-blur-[2px] text-[#F4F4F5]'
-          : 'bg-white/70 backdrop-blur-[2px] text-neutral-900'
+          ? 'bg-[#08080A]/95 text-[#F4F4F5]'
+          : 'bg-white/95 text-neutral-900'
       }`}
     >
 
       {/* Atmospheric Ambient Glow */}
       <div
-        className="skills-portal-glow pointer-events-none absolute -top-40 left-1/2 h-[340px] w-[750px] -translate-x-1/2 rounded-full opacity-0 blur-[120px] transition-all duration-700"
-        style={{ backgroundColor: accentColor }}
+        className="skills-portal-glow pointer-events-none absolute -top-40 left-1/2 h-[340px] w-[750px] -translate-x-1/2 rounded-full opacity-0 transition-opacity duration-700 will-change-transform transform-gpu"
+        style={{
+          background: `radial-gradient(ellipse at center, ${accentColor} 0%, transparent 70%)`,
+          transform: 'translate3d(-50%, 0, 0)',
+        }}
       />
 
       {/* Atmospheric Watermark */}
       <div
-        className="skills-watermark-num pointer-events-none absolute right-4 sm:right-16 top-12 select-none font-mono text-[140px] sm:text-[260px] font-black leading-none opacity-[0.025] dark:opacity-[0.045] transition-opacity"
+        className="skills-watermark-num pointer-events-none absolute right-4 sm:right-16 top-12 select-none font-mono text-[140px] sm:text-[260px] font-black leading-none opacity-[0.025] dark:opacity-[0.045] transition-opacity will-change-transform transform-gpu"
         aria-hidden="true"
       >
         03

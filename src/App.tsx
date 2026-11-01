@@ -6,7 +6,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import TargetCursor from './components/TargetCursor';
-import { ScrollProgressBar } from './components/ScrollProgressBar';
 import { HeroSection } from './components/HeroSection';
 import { AboutSection } from './components/AboutSection';
 import { SkillsSection } from './components/SkillsSection';
@@ -20,7 +19,6 @@ import { GlassDock } from './components/GlassDock';
 import { ThemeTransitionOverlay } from './components/ThemeTransitionOverlay';
 import { ArchitecturalPreloader } from './components/ArchitecturalPreloader';
 import { BackgroundParticles } from './components/BackgroundParticles';
-import { ParallaxBackground } from './components/ParallaxBackground';
 import { SectionGateway } from './components/SectionGateway';
 import { ViewportPageTransition } from './components/ViewportPageTransition';
 import {
@@ -235,21 +233,8 @@ export default function App() {
         }}
       />
 
-      {/* Multi-Layered Spatial Parallax Background with Mouse & Scroll Depth */}
-      <ParallaxBackground
-        accentColor={heroConfig.accentColor}
-        secondaryAccent={heroConfig.secondaryAccent}
-        colorMode={heroConfig.colorMode}
-      />
-
       {/* Global Interactive Spatial Particles Layer */}
       <BackgroundParticles
-        accentColor={heroConfig.accentColor}
-        colorMode={heroConfig.colorMode}
-      />
-
-      {/* Top Viewport Scroll Progress Bar */}
-      <ScrollProgressBar
         accentColor={heroConfig.accentColor}
         colorMode={heroConfig.colorMode}
       />
