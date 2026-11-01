@@ -122,9 +122,8 @@ export const ParallaxBackground: React.FC<ParallaxBackgroundProps> = ({
           x: layer2X,
           y: layer2Y,
         }}
-        className={`absolute top-[28vh] left-[8vw] hidden font-mono text-[9px] tracking-widest sm:block ${
-          isDark ? 'text-white/20' : 'text-black/15'
-        }`}
+        className={`absolute top-[28vh] left-[8vw] hidden font-mono text-[9px] tracking-widest sm:block ${isDark ? 'text-white/20' : 'text-black/15'
+          }`}
       >
         <div className="flex items-center gap-1.5">
           <span style={{ color: accentColor }}>+</span>
@@ -138,9 +137,8 @@ export const ParallaxBackground: React.FC<ParallaxBackgroundProps> = ({
           x: layer1X,
           y: layer1Y,
         }}
-        className={`absolute top-[65vh] right-[6vw] hidden font-mono text-[9px] tracking-widest sm:block ${
-          isDark ? 'text-white/20' : 'text-black/15'
-        }`}
+        className={`absolute top-[65vh] right-[6vw] hidden font-mono text-[9px] tracking-widest sm:block ${isDark ? 'text-white/20' : 'text-black/15'
+          }`}
       >
         <div className="flex items-center gap-1.5">
           <span>VECTOR_PLANE // R-02</span>
@@ -154,9 +152,8 @@ export const ParallaxBackground: React.FC<ParallaxBackgroundProps> = ({
           x: layer3X,
           y: layer3Y,
         }}
-        className={`absolute top-[110vh] left-[5vw] hidden font-mono text-[9px] tracking-widest sm:block ${
-          isDark ? 'text-white/20' : 'text-black/15'
-        }`}
+        className={`absolute top-[110vh] left-[5vw] hidden font-mono text-[9px] tracking-widest sm:block ${isDark ? 'text-white/20' : 'text-black/15'
+          }`}
       >
         <div className="flex items-center gap-1.5">
           <span style={{ color: accentColor }}>•</span>

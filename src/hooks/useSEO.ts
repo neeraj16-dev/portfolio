@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 export interface SectionMetadata {
   title: string;
@@ -43,7 +43,7 @@ export const useSEO = ({
   is404 = false,
   currentPath = '/',
 }: UseSEOOptions = {}) => {
-  const [activeSection, setActiveSection] = useState<string>('hero');
+  const activeSectionRef = useRef<string>('hero');
 
   const setMetaTag = (selector: string, attributeName: string, attributeValue: string, content: string) => {
     let element = document.querySelector(selector);
@@ -55,38 +55,7 @@ export const useSEO = ({
     element.setAttribute('content', content);
   };
 
-  useEffect(() => {
-    if (is404) return;
-    const sectionIds = ['hero', 'about', 'works', 'contact'];
-    const sections = sectionIds
-      .map((id) => document.getElementById(id))
-      .filter((el): el is HTMLElement => el !== null);
-
-    if (sections.length === 0) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visibleEntries = entries.filter((e) => e.isIntersecting);
-        if (visibleEntries.length > 0) {
-          visibleEntries.sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-          const topEntry = visibleEntries[0];
-          if (topEntry.target.id) {
-            setActiveSection(topEntry.target.id);
-          }
-        }
-      },
-      {
-        root: null,
-        rootMargin: '-20% 0px -30% 0px',
-        threshold: [0.1, 0.25, 0.5, 0.75],
-      }
-    );
-
-    sections.forEach((s) => observer.observe(s));
-    return () => observer.disconnect();
-  }, [is404]);
-
-  useEffect(() => {
+  const applyMetadata = (section: string) => {
     let title = `${brandName} - ${roleTagline}`;
     let description = `Portfolio of ${brandName}: Spatial web experiences, interactive shaders, and high-performance digital products.`;
 
@@ -102,11 +71,11 @@ export const useSEO = ({
       } else if (activeModal === 'contact') {
         title = `Initiate Collaboration & Inquiries - ${brandName}`;
         description = `Direct contact and inquiries with ${brandName} for full-stack systems, WebGL shaders, and AI engineering collaborations.`;
-      } else if (customSections[activeSection]) {
-        title = customSections[activeSection].title;
-        description = customSections[activeSection].description;
-      } else if (DEFAULT_SECTION_METADATA[activeSection]) {
-        const meta = DEFAULT_SECTION_METADATA[activeSection](brandName, roleTagline);
+      } else if (customSections[section]) {
+        title = customSections[section].title;
+        description = customSections[section].description;
+      } else if (DEFAULT_SECTION_METADATA[section]) {
+        const meta = DEFAULT_SECTION_METADATA[section](brandName, roleTagline);
         title = meta.title;
         description = meta.description;
       }
@@ -122,7 +91,7 @@ export const useSEO = ({
       'meta[property="og:url"]',
       'property',
       'og:url',
-      window.location.origin + window.location.pathname + (activeSection !== 'hero' && !is404 ? `#${activeSection}` : '')
+      window.location.origin + window.location.pathname + (section !== 'hero' && !is404 ? `#${section}` : '')
     );
     setMetaTag('meta[name="twitter:card"]', 'name', 'twitter:card', 'summary_large_image');
     setMetaTag('meta[name="twitter:title"]', 'name', 'twitter:title', title);
@@ -164,9 +133,6 @@ export const useSEO = ({
             longitude: 72.877426,
           },
           knowsAbout: [
-            'WebGL',
-            'GLSL Shaders',
-            'Three.js',
             'Full Stack Development',
             'Artificial Intelligence',
             'Autonomous Agents',
@@ -188,9 +154,46 @@ export const useSEO = ({
       ],
     };
     schemaScript.textContent = JSON.stringify(structuredData);
-  }, [activeSection, activeModal, brandName, roleTagline, location, customSections, is404, currentPath]);
+  };
 
-  return { activeSection };
+  useEffect(() => {
+    applyMetadata(activeSectionRef.current);
+  }, [activeModal, brandName, roleTagline, location, customSections, is404, currentPath]);
+
+  useEffect(() => {
+    if (is404) return;
+    const sectionIds = ['hero', 'about', 'works', 'contact'];
+    const sections = sectionIds
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
+
+    if (sections.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntries = entries.filter((e) => e.isIntersecting);
+        if (visibleEntries.length > 0) {
+          visibleEntries.sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+          const topEntry = visibleEntries[0];
+          if (topEntry.target.id && topEntry.target.id !== activeSectionRef.current) {
+            activeSectionRef.current = topEntry.target.id;
+            applyMetadata(topEntry.target.id);
+          }
+        }
+      },
+      {
+        root: null,
+        rootMargin: '-20% 0px -30% 0px',
+        threshold: [0.1, 0.25, 0.5, 0.75],
+      }
+    );
+
+    sections.forEach((s) => observer.observe(s));
+    return () => observer.disconnect();
+  }, [is404]);
+
+  return { activeSection: activeSectionRef.current };
 };
 
 export default useSEO;
+

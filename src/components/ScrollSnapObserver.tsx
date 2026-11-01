@@ -28,22 +28,19 @@ export const ScrollSnapObserver: React.FC<ScrollSnapObserverProps> = ({
   const isAnimatingRef = useRef(false);
   const [isAnimatingState, setIsAnimatingState] = useState(false);
   const [activeIdx, setActiveIdx] = useState(0);
-
+  const activeIdxRef = useRef(0);
   const chevronRef = useRef<HTMLDivElement>(null);
   const pulseTweenRef = useRef<gsap.core.Tween | null>(null);
 
-  // Check which section is currently centered or at top of the viewport
+  // Check which section is currently active using offsetTop without forcing layout reflows
   const getActiveSectionIndex = (): number => {
     if (typeof window === 'undefined') return 0;
     const scrollPos = window.scrollY + window.innerHeight * 0.35;
     let foundIndex = 0;
     for (let i = 0; i < SECTIONS.length; i++) {
-      const el = document.querySelector(SECTIONS[i]);
-      if (el) {
-        const top = el.getBoundingClientRect().top + window.scrollY;
-        if (top <= scrollPos) {
-          foundIndex = i;
-        }
+      const el = document.querySelector(SECTIONS[i]) as HTMLElement | null;
+      if (el && el.offsetTop <= scrollPos) {
+        foundIndex = i;
       }
     }
     return foundIndex;
@@ -108,7 +105,7 @@ export const ScrollSnapObserver: React.FC<ScrollSnapObserverProps> = ({
   const handleScrollDown = () => {
     if (isAnimatingRef.current) return;
 
-    const currentIdx = getActiveSectionIndex();
+    const currentIdx = activeIdxRef.current;
     const currentEl = document.querySelector(SECTIONS[currentIdx]) as HTMLElement | null;
 
     // Allow normal scroll within section if content overflows
@@ -130,7 +127,7 @@ export const ScrollSnapObserver: React.FC<ScrollSnapObserverProps> = ({
   const handleScrollUp = () => {
     if (isAnimatingRef.current) return;
 
-    const currentIdx = getActiveSectionIndex();
+    const currentIdx = activeIdxRef.current;
     const currentEl = document.querySelector(SECTIONS[currentIdx]) as HTMLElement | null;
 
     // Allow normal scroll within section if content overflows
@@ -182,17 +179,34 @@ export const ScrollSnapObserver: React.FC<ScrollSnapObserverProps> = ({
       onDown: () => handleScrollUp(),
     });
 
-    const updateActiveIndexOnScroll = () => {
-      if (!isAnimatingRef.current) {
-        setActiveIdx(getActiveSectionIndex());
+    // Observe sections using native IntersectionObserver without scroll listener layout thrashing
+    const sectionObserver = new IntersectionObserver(
+      (entries) => {
+        if (isAnimatingRef.current) return;
+        const visibleEntries = entries.filter((e) => e.isIntersecting);
+        if (visibleEntries.length > 0) {
+          visibleEntries.sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+          const topId = `#${visibleEntries[0].target.id}`;
+          const idx = SECTIONS.indexOf(topId);
+          if (idx !== -1 && idx !== activeIdxRef.current) {
+            activeIdxRef.current = idx;
+            setActiveIdx(idx);
+          }
+        }
+      },
+      {
+        threshold: [0.15, 0.4, 0.7],
       }
-    };
+    );
 
-    window.addEventListener('scroll', updateActiveIndexOnScroll, { passive: true });
+    SECTIONS.forEach((selector) => {
+      const el = document.querySelector(selector);
+      if (el) sectionObserver.observe(el);
+    });
 
     return () => {
       observer.kill();
-      window.removeEventListener('scroll', updateActiveIndexOnScroll);
+      sectionObserver.disconnect();
     };
   }, []);
 

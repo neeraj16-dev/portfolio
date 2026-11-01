@@ -57,9 +57,10 @@ export const BackgroundParticles: React.FC<BackgroundParticlesProps> = ({
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     let animId = 0;
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
-    let width = (canvas.width = window.innerWidth * dpr);
-    let height = (canvas.height = window.innerHeight * dpr);
+    // Ambient background dots do not need 4K HiDPI retina rasterization; 1x DPR cuts pixel load by 75%
+    const dpr = 1;
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
 
     const parseHexRgb = (hex: string) => {
       let c = hex.replace('#', '');
@@ -78,8 +79,8 @@ export const BackgroundParticles: React.FC<BackgroundParticlesProps> = ({
 
     // Responsive particle count tuned for ultra-lightweight 120fps performance
     const effectiveCount = Math.min(
-      36,
-      Math.max(18, Math.floor((window.innerWidth * window.innerHeight) / 45000))
+      28,
+      Math.max(14, Math.floor((window.innerWidth * window.innerHeight) / 55000))
     );
 
     const particles: Particle[] = [];
@@ -108,8 +109,8 @@ export const BackgroundParticles: React.FC<BackgroundParticlesProps> = ({
 
     const handleResize = () => {
       if (!canvas) return;
-      width = canvas.width = window.innerWidth * dpr;
-      height = canvas.height = window.innerHeight * dpr;
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
     };
 
     const handlePointerMove = (e: PointerEvent) => {
@@ -147,6 +148,11 @@ export const BackgroundParticles: React.FC<BackgroundParticlesProps> = ({
     const render = (time: number) => {
       animId = requestAnimationFrame(render);
       if (!isTabVisible) return;
+
+      // Viewport culling: When scrolled deep down past the hero zone, skip canvas clearing & redrawing
+      if (scrollRef.current.y > window.innerHeight * 1.4) {
+        return;
+      }
 
       const dt = Math.min((time - lastTime) / 1000, 0.08);
       lastTime = time;

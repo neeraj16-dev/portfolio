@@ -104,7 +104,7 @@ export const CircularCarousel: React.FC<CircularCarouselProps> = ({
       if (isVisible) {
         // Continuous smooth drift (speed in degrees/sec)
         angle += speed * dt;
-        ring.style.transform = `rotateY(${-angle}deg)`;
+        ring.style.transform = `translate3d(0, 0, 0) rotateY(${-angle}deg)`;
       }
 
       if (isVisible && !document.hidden) {

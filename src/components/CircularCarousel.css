@@ -9,6 +9,8 @@
   user-select: none;
   -webkit-user-select: none;
   pointer-events: none;
+  contain: layout paint;
+  isolation: isolate;
 }
 
 .circular-carousel__view {
@@ -28,6 +30,7 @@
   justify-content: center;
   transform-style: preserve-3d;
   will-change: transform;
+  transform: translateZ(0);
   pointer-events: none;
 }
 
@@ -37,6 +40,7 @@
   height: 0;
   transform-style: preserve-3d;
   will-change: transform;
+  transform: translateZ(0);
   pointer-events: none;
 }
 
@@ -48,6 +52,7 @@
   height: 0;
   transform-style: preserve-3d;
   will-change: transform;
+  transform: translateZ(0);
   pointer-events: none;
 }
 
@@ -59,6 +64,7 @@
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   will-change: transform;
+  transform: translateZ(0);
   pointer-events: none;
 }
 

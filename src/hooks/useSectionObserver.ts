@@ -129,9 +129,20 @@ export function useSectionObserver(
       }
     });
 
-    // Passive scroll listener for fast flicks and boundary checks
+    // Lightweight boundary checks for top and bottom edges without reflows
+    let scrollDebounce: number | null = null;
     const handleScroll = () => {
-      requestEvaluation();
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      if (scrollY < topOffset) {
+        commitActiveSection(stableSectionIds[0]);
+        return;
+      }
+      const clientHeight = window.innerHeight;
+      const scrollHeight = document.documentElement.scrollHeight;
+      if (scrollHeight - (scrollY + clientHeight) < bottomOffset) {
+        commitActiveSection(stableSectionIds[stableSectionIds.length - 1]);
+        return;
+      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });

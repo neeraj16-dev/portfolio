@@ -112,12 +112,16 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
 
       {/* Atmospheric Spatial Red Glow */}
       <div
-        className="pointer-events-none absolute -top-40 right-1/4 h-[350px] w-[700px] rounded-full blur-[140px] opacity-15 transition-all duration-700 bg-red-600"
+        className="pointer-events-none absolute -top-40 right-1/4 h-[350px] w-[700px] rounded-full opacity-15 transition-opacity duration-700 will-change-transform transform-gpu"
+        style={{
+          background: 'radial-gradient(ellipse at center, rgba(220, 38, 38, 0.8) 0%, transparent 70%)',
+          transform: 'translateZ(0)',
+        }}
       />
 
       {/* Atmospheric Parallax Numeric Watermark */}
       <div
-        className="projects-watermark-num pointer-events-none absolute left-4 sm:left-14 top-12 select-none font-mono text-[140px] sm:text-[260px] font-black leading-none opacity-[0.025] dark:opacity-[0.045] transition-opacity"
+        className="projects-watermark-num pointer-events-none absolute left-4 sm:left-14 top-12 select-none font-mono text-[140px] sm:text-[260px] font-black leading-none opacity-[0.025] dark:opacity-[0.045] transition-opacity will-change-transform transform-gpu"
         aria-hidden="true"
       >
         04
