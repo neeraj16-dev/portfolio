@@ -403,24 +403,16 @@ export default function App() {
               icon: () => null,
               onClick: handleToggleColorMode,
             },
+            /*
+            // [CUSTOMIZER BUTTON - See notes.txt to re-enable]
+            // To re-enable the Customizer button in the GlassDock UI, simply uncomment the block below:
             {
               title: 'Customizer',
               icon: () => null,
               className: 'hidden sm:flex',
               onClick: () => setIsCustomizerOpen((prev) => !prev),
             },
-            {
-              title: 'GitHub',
-              icon: () => null,
-              className: 'hidden sm:flex',
-              href: heroConfig.contactGithub || 'https://github.com/neerajmayekar',
-            },
-            {
-              title: 'LinkedIn',
-              icon: () => null,
-              className: 'hidden sm:flex',
-              href: heroConfig.contactLinkedin || 'https://linkedin.com',
-            },
+            */
           ]}
         />
       </div>

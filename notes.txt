@@ -1,0 +1,66 @@
+================================================================================
+PORTFOLIO PROJECT NOTES & CONFIGURATION GUIDE
+================================================================================
+
+1. HOW TO RE-ENABLE THE CUSTOMIZER BUTTON (GLOBAL CUSTOMIZER STUDIO)
+--------------------------------------------------------------------------------
+The Global Customizer drawer code is completely intact and functional in the project.
+It has only been hidden from the floating bottom navigation bar (GlassDock).
+
+To re-enable the Customizer button in the UI:
+1. Open file: src/App.tsx
+2. Locate the <GlassDock> component (around line 370 - 415).
+3. In the `items` array, you will find the commented-out Customizer item:
+
+   /*
+   // [CUSTOMIZER BUTTON - See notes.txt to re-enable]
+   // To re-enable the Customizer button in the GlassDock UI, simply uncomment the block below:
+   {
+     title: 'Customizer',
+     icon: () => null,
+     className: 'hidden sm:flex',
+     onClick: () => setIsCustomizerOpen((prev) => !prev),
+   },
+   */
+
+4. Remove the opening `/*` and closing `*/` around this block so it looks like:
+
+   {
+     title: 'Customizer',
+     icon: () => null,
+     className: 'hidden sm:flex',
+     onClick: () => setIsCustomizerOpen((prev) => !prev),
+   },
+
+5. Save the file. The Customizer studio button will immediately reappear on the GlassDock.
+
+
+2. CONTACT FORM & GOOGLE SHEETS ENDPOINT CONFIGURATION
+--------------------------------------------------------------------------------
+The contact form in src/components/ContactSection.tsx sends submissions directly
+to your Google Spreadsheet without requiring any backend server.
+
+Form Fields Sent:
+- name      (Sender's Name)
+- email     (Sender's Email)
+- subject   (Inquiry Subject)
+- message   (Message Body)
+- timestamp (Auto-generated in IST: Asia/Kolkata)
+
+To connect your Google Apps Script Web App:
+- Option A: Add your URL to the .env file in the root folder:
+    VITE_GOOGLE_SHEETS_SCRIPT_URL="https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec"
+  (Also add this key to your Vercel Project Settings > Environment Variables)
+
+- Option B: Paste the URL directly into src/components/ContactSection.tsx at line 23:
+    const GOOGLE_SHEETS_SCRIPT_URL =
+      import.meta.env.VITE_GOOGLE_SHEETS_SCRIPT_URL || 'YOUR_WEB_APP_URL_HERE';
+
+Google Sheet Setup:
+1. Tab name: "Submissions"
+2. Row 1 Column headers:
+   A: Timestamp | B: Name | C: Email | D: Subject | E: Message
+3. Apps Script Web App Deployment Settings:
+   - Execute as: Me
+   - Who has access: Anyone
+================================================================================
