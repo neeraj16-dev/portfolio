@@ -14,7 +14,14 @@ import {
   ArrowRight,
   Phone,
   ArrowUp,
+  Loader2,
 } from 'lucide-react';
+
+// Google Apps Script Web App URL for spreadsheet submission.
+// You can either paste your deployed Web App URL (/exec) directly here,
+// or add VITE_GOOGLE_SHEETS_SCRIPT_URL to your .env file or Vercel Environment Variables.
+const GOOGLE_SHEETS_SCRIPT_URL =
+  import.meta.env.VITE_GOOGLE_SHEETS_SCRIPT_URL || '';
 
 interface ContactSectionProps {
   accentColor?: string;
@@ -51,6 +58,8 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
     message: '',
   });
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const activeEmail =
     directEmail && directEmail !== 'princerajput.rk7@gmail.com'
@@ -147,14 +156,44 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
     setTimeout(() => setPhoneCopied(false), 2000);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const subjectLine = encodeURIComponent(formData.subject || 'Portfolio Inquiry');
-    const bodyContent = encodeURIComponent(
-      `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
-    );
-    window.location.href = `mailto:${activeEmail}?subject=${subjectLine}&body=${bodyContent}`;
-    setSubmitted(true);
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    // If Google Apps Script Web App URL is not provided yet, fallback to mailto:
+    if (!GOOGLE_SHEETS_SCRIPT_URL) {
+      const subjectLine = encodeURIComponent(formData.subject || 'Portfolio Inquiry');
+      const bodyContent = encodeURIComponent(
+        `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
+      );
+      window.location.href = `mailto:${activeEmail}?subject=${subjectLine}&body=${bodyContent}`;
+      setSubmitted(true);
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      // Send as URLSearchParams so Google Apps Script automatically parses e.parameter without CORS preflight block
+      const payload = new URLSearchParams();
+      payload.append('name', formData.name);
+      payload.append('email', formData.email);
+      payload.append('subject', formData.subject);
+      payload.append('message', formData.message);
+
+      await fetch(GOOGLE_SHEETS_SCRIPT_URL, {
+        method: 'POST',
+        body: payload,
+        mode: 'no-cors', // Critical: Google Apps Script redirects require no-cors in browser fetch
+      });
+
+      setSubmitted(true);
+    } catch (err) {
+      console.error('Contact form submission error:', err);
+      setSubmitError('Unable to record to spreadsheet. You can send your message directly via email below.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleScrollToTop = () => {
@@ -317,7 +356,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
               <div className={`border-t ${isDark ? 'border-white/10 divide-y divide-white/10' : 'border-neutral-200 divide-y divide-neutral-200'}`}>
                 {/* GitHub */}
                 <a
-                  href={githubUrl}
+                  href="https://www.github.com/neeraj16-dev"
                   target="_blank"
                   rel="noopener noreferrer"
                   className={`cursor-target group flex items-center justify-between py-4 px-2.5 rounded-xl transition-all ${isDark ? 'hover:bg-white/[0.04]' : 'hover:bg-neutral-100/80'}`}
@@ -334,7 +373,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
 
                 {/* LinkedIn */}
                 <a
-                  href={linkedinUrl}
+                  href="https://www.linkedin.com/in/neerajmayekar"
                   target="_blank"
                   rel="noopener noreferrer"
                   className={`cursor-target group flex items-center justify-between py-4 px-2.5 rounded-xl transition-all ${isDark ? 'hover:bg-white/[0.04]' : 'hover:bg-neutral-100/80'}`}
@@ -389,7 +428,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                   </div>
                   <h4 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-neutral-900'}`}>Message Dispatched</h4>
                   <p className={`max-w-md mx-auto text-sm leading-relaxed font-light ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>
-                    Thank you, {formData.name || 'friend'}! Your email client has been prepared with your message addressed to {activeEmail}.
+                    Thank you, {formData.name || 'friend'}! Your message has been received and saved. I will review it and get back to you shortly.
                   </p>
                   <button
                     type="button"
@@ -400,7 +439,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                     className={`cursor-target mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-semibold border transition-all ${isDark
                       ? 'bg-white/10 hover:bg-white/20 text-white border-white/15'
                       : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-900 border-neutral-300'
-                    }`}
+                      }`}
                   >
                     Send another message
                   </button>
@@ -415,14 +454,15 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                       </label>
                       <input
                         type="text"
+                        name="name"
                         required
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         placeholder="Patrick Jane"
-                        className={`w-full rounded-xl px-4 py-3 text-sm focus:outline-none transition-all ${isDark
-                          ? 'border border-white/10 bg-neutral-950/80 text-white placeholder-neutral-500 focus:border-red-500/60 focus:bg-neutral-900'
-                          : 'border border-neutral-300 bg-neutral-50/90 text-neutral-900 placeholder-neutral-400 focus:border-red-500 focus:bg-white focus:ring-2 focus:ring-red-500/10'
-                        }`}
+                        className={`w-full rounded-xl px-4 py-3 text-sm focus:outline-none transition-all duration-300 ease-out ${isDark
+                          ? 'border border-white/10 bg-neutral-950/80 text-white placeholder-neutral-500 focus:border-red-500 focus:bg-neutral-900/90 focus:ring-2 focus:ring-red-500/25 focus:shadow-[0_0_15px_rgba(239,68,68,0.2)]'
+                          : 'border border-neutral-300 bg-neutral-50/90 text-neutral-900 placeholder-neutral-400 focus:border-red-500 focus:bg-white focus:ring-2 focus:ring-red-500/20 focus:shadow-[0_0_15px_rgba(239,68,68,0.12)]'
+                          }`}
                       />
                     </div>
 
@@ -433,14 +473,15 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                       </label>
                       <input
                         type="email"
+                        name="email"
                         required
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         placeholder="patrickjane@company.com"
-                        className={`w-full rounded-xl px-4 py-3 text-sm focus:outline-none transition-all ${isDark
-                          ? 'border border-white/10 bg-neutral-950/80 text-white placeholder-neutral-500 focus:border-red-500/60 focus:bg-neutral-900'
-                          : 'border border-neutral-300 bg-neutral-50/90 text-neutral-900 placeholder-neutral-400 focus:border-red-500 focus:bg-white focus:ring-2 focus:ring-red-500/10'
-                        }`}
+                        className={`w-full rounded-xl px-4 py-3 text-sm focus:outline-none transition-all duration-300 ease-out ${isDark
+                          ? 'border border-white/10 bg-neutral-950/80 text-white placeholder-neutral-500 focus:border-red-500 focus:bg-neutral-900/90 focus:ring-2 focus:ring-red-500/25 focus:shadow-[0_0_15px_rgba(239,68,68,0.2)]'
+                          : 'border border-neutral-300 bg-neutral-50/90 text-neutral-900 placeholder-neutral-400 focus:border-red-500 focus:bg-white focus:ring-2 focus:ring-red-500/20 focus:shadow-[0_0_15px_rgba(239,68,68,0.12)]'
+                          }`}
                       />
                     </div>
                   </div>
@@ -452,14 +493,15 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                     </label>
                     <input
                       type="text"
+                      name="subject"
                       required
                       value={formData.subject}
                       onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                       placeholder="A question about something I've built"
-                      className={`w-full rounded-xl px-4 py-3 text-sm focus:outline-none transition-all ${isDark
-                        ? 'border border-white/10 bg-neutral-950/80 text-white placeholder-neutral-500 focus:border-red-500/60 focus:bg-neutral-900'
-                        : 'border border-neutral-300 bg-neutral-50/90 text-neutral-900 placeholder-neutral-400 focus:border-red-500 focus:bg-white focus:ring-2 focus:ring-red-500/10'
-                      }`}
+                      className={`w-full rounded-xl px-4 py-3 text-sm focus:outline-none transition-all duration-300 ease-out ${isDark
+                        ? 'border border-white/10 bg-neutral-950/80 text-white placeholder-neutral-500 focus:border-red-500 focus:bg-neutral-900/90 focus:ring-2 focus:ring-red-500/25 focus:shadow-[0_0_15px_rgba(239,68,68,0.2)]'
+                        : 'border border-neutral-300 bg-neutral-50/90 text-neutral-900 placeholder-neutral-400 focus:border-red-500 focus:bg-white focus:ring-2 focus:ring-red-500/20 focus:shadow-[0_0_15px_rgba(239,68,68,0.12)]'
+                        }`}
                     />
                   </div>
 
@@ -469,29 +511,51 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                       Message
                     </label>
                     <textarea
+                      name="message"
                       required
                       rows={5}
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                       placeholder="A few lines about what's on your mind..."
-                      className={`w-full resize-none rounded-xl px-4 py-3 text-sm focus:outline-none transition-all ${isDark
-                        ? 'border border-white/10 bg-neutral-950/80 text-white placeholder-neutral-500 focus:border-red-500/60 focus:bg-neutral-900'
-                        : 'border border-neutral-300 bg-neutral-50/90 text-neutral-900 placeholder-neutral-400 focus:border-red-500 focus:bg-white focus:ring-2 focus:ring-red-500/10'
-                      }`}
+                      className={`w-full resize-none rounded-xl px-4 py-3 text-sm focus:outline-none transition-all duration-300 ease-out ${isDark
+                        ? 'border border-white/10 bg-neutral-950/80 text-white placeholder-neutral-500 focus:border-red-500 focus:bg-neutral-900/90 focus:ring-2 focus:ring-red-500/25 focus:shadow-[0_0_15px_rgba(239,68,68,0.2)]'
+                        : 'border border-neutral-300 bg-neutral-50/90 text-neutral-900 placeholder-neutral-400 focus:border-red-500 focus:bg-white focus:ring-2 focus:ring-red-500/20 focus:shadow-[0_0_15px_rgba(239,68,68,0.12)]'
+                        }`}
                     />
                   </div>
 
                   {/* Submit Button */}
                   <div className="pt-2">
+                    {submitError && (
+                      <div className="mb-4 p-3.5 rounded-xl border border-red-500/20 bg-red-500/10 text-xs text-red-400 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                        <span>{submitError}</span>
+                        <a
+                          href={`mailto:${activeEmail}?subject=${encodeURIComponent(formData.subject || 'Portfolio Inquiry')}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`)}`}
+                          className="font-bold underline hover:text-red-300 shrink-0"
+                        >
+                          Email directly &rarr;
+                        </a>
+                      </div>
+                    )}
                     <button
                       type="submit"
-                      className={`cursor-target w-full py-4 px-6 rounded-full font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all active:scale-[0.99] ${isDark
+                      disabled={isSubmitting}
+                      className={`cursor-target w-full py-4 px-6 rounded-full font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed ${isDark
                         ? 'bg-white hover:bg-neutral-200 text-neutral-950 shadow-[0_0_25px_rgba(255,255,255,0.25)] hover:shadow-[0_0_30px_rgba(255,255,255,0.4)]'
                         : 'bg-neutral-950 hover:bg-neutral-800 text-white shadow-lg shadow-neutral-950/20 hover:shadow-xl'
-                      }`}
+                        }`}
                     >
-                      <span>Send message</span>
-                      <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>Sending message...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Send message</span>
+                          <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+                        </>
+                      )}
                     </button>
                   </div>
                 </form>
